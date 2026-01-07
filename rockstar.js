@@ -563,26 +563,109 @@
             form.find("input.name").focus();
         });
         createDiv("Search Groups (experimental)", mainPopup, () => {
-            const object = {
-                url: "/api/v1/groups?expand=stats",
-                data() {this.match = new RegExp(this.search, "i"); return {limit: this.limit};},
-                filter: group => group.profile.name.match(object.match),
-                limit: 10000,
-                comparer: (group1, group2) => group1.profile.name.localeCompare(group2.profile.name),
-                template(group) {
-                    const logo = group._links.logo[0].href.split('/')[7].split('-')[0].replace(/odyssey/, 'okta');
-                    return `<tr><td class=column-width><span class='icon icon-24 group-logos-24 logo-${logo}'></span>` +
-                        `<td><a href="/admin/group/${group.id}">${e(group.profile.name)}</a>` +
-                        `<td>${e(group.profile.description || "No description")}` + 
-                        `<td>${group._embedded.stats.usersCount}` +
-                        `<td>${group._embedded.stats.appsCount}` +
-                        `<td>${group._embedded.stats.groupPushMappingsCount}`;
-                },
-                headers: "<tr><th>Source<th>Name<th>Description<th>People<th>Apps<th>Directories",
-                placeholder: "Search name with wildcard...",
-                empty: true
-            };
-            searcher(object);
+            const searchPopup = createPopup("Search Groups", false, true);
+            
+            // Create our own search interface
+            const searchHTML = `
+                <div style="margin-bottom: 10px;">
+                    <input type="text" id="groupSearchInput" placeholder="Search name with wildcard..." 
+                           style="width: 300px; padding: 5px; border: 1px solid #ccc; border-radius: 3px;">
+                    <span style="margin-left: 10px; font-size: 12px; color: #666;">Enter text to search group names</span>
+                </div>
+                <div id="groupSearchResults">
+                    <p style="color: #666; font-style: italic;">Enter search text to find groups...</p>
+                </div>
+            `;
+            
+            searchPopup.html(searchHTML);
+            
+            let timeoutID = 0;
+            
+            searchPopup.find('#groupSearchInput').on('input', function() {
+                const searchTerm = this.value.trim();
+                const resultsDiv = searchPopup.find('#groupSearchResults');
+                
+                if (searchTerm.length === 0) {
+                    resultsDiv.html('<p style="color: #666; font-style: italic;">Enter search text to find groups...</p>');
+                    return;
+                }
+                
+                clearTimeout(timeoutID);
+                timeoutID = setTimeout(() => {
+                    resultsDiv.html('<p style="color: #666;">Searching groups...</p>');
+                    
+                    $.get({
+                        url: location.origin + "/api/v1/groups",
+                        data: { expand: "stats", limit: 10000 },
+                        headers
+                    }).then(groups => {
+                        // Filter groups by search term (case-insensitive)
+                        const searchRegex = new RegExp(searchTerm, "i");
+                        const filteredGroups = groups.filter(group => group.profile.name.match(searchRegex));
+                        
+                        if (filteredGroups.length === 0) {
+                            resultsDiv.html('<p style="color: #666;">No groups found matching your search.</p>');
+                            return;
+                        }
+                        
+                        // Sort groups by name
+                        filteredGroups.sort((a, b) => a.profile.name.localeCompare(b.profile.name));
+                        
+                        let tableHTML = `
+                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                <thead>
+                                    <tr style="background: #f5f5f5;">
+                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Source</th>
+                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Name</th>
+                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Description</th>
+                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">People</th>
+                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Apps</th>
+                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Directories</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        `;
+                        
+                        filteredGroups.forEach(group => {
+                            const logo = group._links.logo[0].href.split('/')[7].split('-')[0].replace(/odyssey/, 'okta');
+                            const description = group.profile.description || "No description";
+                            const peopleCount = group._embedded.stats.usersCount;
+                            const appsCount = group._embedded.stats.appsCount;
+                            const directoriesCount = group._embedded.stats.groupPushMappingsCount;
+                            
+                            tableHTML += `
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                        <span class='icon icon-24 group-logos-24 logo-${logo}'></span>
+                                    </td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                        <a href="/admin/group/${group.id}" target="_blank" style="color: #0073e6; text-decoration: none;">
+                                            ${e(group.profile.name)}
+                                        </a>
+                                    </td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">${e(description)}</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">${peopleCount}</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">${appsCount}</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">${directoriesCount}</td>
+                                </tr>
+                            `;
+                        });
+                        
+                        tableHTML += '</tbody></table>';
+                        
+                        // Add result count
+                        const countText = `<p style="margin-bottom: 10px; font-weight: bold;">Found ${filteredGroups.length} groups</p>`;
+                        resultsDiv.html(countText + tableHTML);
+                        
+                    }).catch(error => {
+                        console.error('Group search error:', error);
+                        resultsDiv.html('<p style="color: red;">Error searching groups. Please try again.</p>');
+                    });
+                }, 400);
+            });
+            
+            // Focus on the search input
+            setTimeout(() => searchPopup.find('#groupSearchInput').focus(), 100);
         });
     }
     
