@@ -1,0 +1,22 @@
+{
+  "name": "rockstar-firefox",
+  "version": "3.2.0",
+  "description": "Firefox-compatible version of the rockstar Okta extension",
+  "scripts": {
+    "build": "web-ext build --source-dir=. --artifacts-dir=../dist",
+    "lint": "web-ext lint --source-dir=.",
+    "run": "web-ext run --source-dir=."
+  },
+  "devDependencies": {
+    "web-ext": "^7.0.0"
+  },
+  "web-ext": {
+    "sourceDir": ".",
+    "artifactsDir": "../dist",
+    "ignoreFiles": [
+      "*.md",
+      "package.json",
+      "node_modules"
+    ]
+  }
+}
