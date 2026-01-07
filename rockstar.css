@@ -11,15 +11,27 @@
 */
 .title {
     font-weight: bold;
+    user-select: none;
 }
 .title:hover {
     background-color: #e8e8e8;
 }
+.rockstar-popup {
+    cursor: move;
+}
+.rockstar-popup .rockstarButtons span,
+.rockstar-popup .rockstarButtons a,
+.rockstar-popup button,
+.rockstar-popup input,
+.rockstar-popup select,
+.rockstar-popup textarea {
+    cursor: pointer;
+}
+.rockstar-popup .close {
+    cursor: pointer;
+}
 .rs_closed {
     display: none;
-}
-.rs_toggle {
-    right: 20px;
 }
 .hoverDiv {
     cursor: pointer;

@@ -16,6 +16,25 @@ This is the Firefox-compatible version of the rockstar Okta extension.
 - Compatible background script (`background.js`) instead of service worker
 - Removed `declarativeContent` permission (not supported in Firefox Manifest V2)
 
+### Enhanced Features
+- **Draggable Popups**: Key popups are now draggable for better user experience
+  - Main rockstar popup can be dragged anywhere on the screen
+  - API Explorer popup is fully draggable
+  - Export popups (CSV exports) are draggable
+  - SSO popup (SAML assertions, etc.) is draggable
+  - Configuration popup is draggable
+- **Position Memory**: Popups remember their position across page navigation
+  - Each popup type saves its position independently in localStorage
+  - Position is restored when reopening the same popup type on any Okta page
+  - Works across different Okta admin pages and user sessions
+- **Improved User Interface**: Click and drag anywhere on the popup (except buttons/links) to reposition
+- **Removed Confusing Toggle**: Removed the left/right toggle button in favor of free dragging
+- **Enhanced Search Users**: "Search Users (experimental)" now opens in its own draggable popup
+  - No longer hijacks the page's existing search interface
+  - Self-contained with real-time search functionality
+  - Clean table display with working user profile links
+  - Better error handling and visual feedback
+
 ### Files Modified
 - `manifest.json` - Converted to Manifest V2 format, removed unsupported permissions
 - `background.js` - New background script (replaces `service_worker.js`)

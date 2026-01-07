@@ -200,7 +200,7 @@
     }
 
     function whatsNew() {
-        const newsPopup = createPopup("What's New");
+        const newsPopup = createPopup("What's New", false, true);
         $(`<h1 style='padding: 5px'>2024-06-11</h1>`).appendTo(newsPopup);
         $(`<div style='padding: 5px'>` +
             `• See Deleted Users, Apps, and Groups.<br/>` +
@@ -209,28 +209,102 @@
     }
 
     function quickUpdate() {
-        $(`<a href='https://www.youtube.com/watch?v=mNTThKVjztc&list=PLZ4_Rj_Aw2Ym-NkC8SFB6wuSfBiBto_6C' target='_blank' rel='noopener'>rockstar overview (youtube)</a><br><br>`).appendTo(mainPopup);
     }
 
     // Admin functions
     function directoryPeople() {
         createDiv("Search Users (experimental)", mainPopup, () => {
-            searcher({
-                url: "/api/v1/users",
-                data() {return {q: this.search, limit: this.limit};},
-                limit: 15, // 15 is the max limit when using q.
-                comparer: (user1, user2) => (user1.profile.firstName + user1.profile.lastName).localeCompare(user2.profile.firstName + user2.profile.lastName),
-                template(user) {
-                    var creds = user.credentials.provider;
-                    var logo = creds.type == "LDAP" ? "ldap_sun_one" : creds.type.toLowerCase();
-                    return `<tr><td><span class='icon icon-24 group-logos-24 logo-${logo}'></span> ${creds.name == "OKTA" ? "Okta" : creds.name}` +
-                        `<td><a href="/admin/user/profile/view/${e(user.id)}#tab-account">${e(user.profile.firstName)} ${e(user.profile.lastName)}</a>` +
-                        `<td>${e(user.profile.login)}<td>${e(user.profile.email)}`;
-                },
-                headers: "<tr><th>Source<th>Name<th>Username<th>Primary Email",
-                placeholder: "Search Active by First/Last/Email...",
-                empty: true
+            const searchPopup = createPopup("Search Users", false, true);
+            
+            // Create our own search interface
+            const searchHTML = `
+                <div style="margin-bottom: 10px;">
+                    <input type="text" id="userSearchInput" placeholder="Search Active by First/Last/Email..." 
+                           style="width: 300px; padding: 5px; border: 1px solid #ccc; border-radius: 3px;">
+                    <span style="margin-left: 10px; font-size: 12px; color: #666;">Min 2 characters, max 15 results</span>
+                </div>
+                <div id="userSearchResults">
+                    <p style="color: #666; font-style: italic;">Enter at least 2 characters to search...</p>
+                </div>
+            `;
+            
+            searchPopup.html(searchHTML);
+            
+            let timeoutID = 0;
+            
+            searchPopup.find('#userSearchInput').on('input', function() {
+                const searchTerm = this.value.trim();
+                const resultsDiv = searchPopup.find('#userSearchResults');
+                
+                if (searchTerm.length < 2) {
+                    resultsDiv.html('<p style="color: #666; font-style: italic;">Enter at least 2 characters to search...</p>');
+                    return;
+                }
+                
+                clearTimeout(timeoutID);
+                timeoutID = setTimeout(() => {
+                    resultsDiv.html('<p style="color: #666;">Searching...</p>');
+                    
+                    $.get({
+                        url: location.origin + "/api/v1/users",
+                        data: { q: searchTerm, limit: 15 },
+                        headers
+                    }).then(users => {
+                        if (users.length === 0) {
+                            resultsDiv.html('<p style="color: #666;">No users found.</p>');
+                            return;
+                        }
+                        
+                        // Sort users by name
+                        users.sort((a, b) => (a.profile.firstName + a.profile.lastName).localeCompare(b.profile.firstName + b.profile.lastName));
+                        
+                        let tableHTML = `
+                            <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
+                                <thead>
+                                    <tr style="background: #f5f5f5;">
+                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Source</th>
+                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Name</th>
+                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Username</th>
+                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Email</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                        `;
+                        
+                        users.forEach(user => {
+                            const creds = user.credentials.provider;
+                            const logo = creds.type == "LDAP" ? "ldap_sun_one" : creds.type.toLowerCase();
+                            const sourceName = creds.name == "OKTA" ? "Okta" : creds.name;
+                            
+                            tableHTML += `
+                                <tr style="border-bottom: 1px solid #eee;">
+                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                        <span class='icon icon-24 group-logos-24 logo-${logo}' title="${sourceName}"></span> ${sourceName}
+                                    </td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                        <a href="/admin/user/profile/view/${e(user.id)}#tab-account" 
+                                           target="_blank" style="color: #0073e6; text-decoration: none;">
+                                            ${e(user.profile.firstName)} ${e(user.profile.lastName)}
+                                        </a>
+                                    </td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">${e(user.profile.login)}</td>
+                                    <td style="padding: 8px; border: 1px solid #ddd;">${e(user.profile.email)}</td>
+                                </tr>
+                            `;
+                        });
+                        
+                        tableHTML += '</tbody></table>';
+                        resultsDiv.html(tableHTML);
+                        
+                    }).catch(error => {
+                        console.error('Search error:', error);
+                        resultsDiv.html('<p style="color: red;">Error searching users. Please try again.</p>');
+                    });
+                }, 400);
             });
+            
+            // Focus on the search input
+            setTimeout(() => searchPopup.find('#userSearchInput').focus(), 100);
         });
     }
     function directoryPerson() {
@@ -244,7 +318,7 @@
             if (ad) {
                 function showADs() {
                     getJSON(`/api/v1/apps?filter=user.id+eq+"${userId}"&expand=user/${userId}&limit=200&q=active_directory`).then(appUsers => {
-                        var adPopup = createPopup("Active Directory");
+                        var adPopup = createPopup("Active Directory", false, true);
                         var rows = "<tr><th>Domain<th>Username<th>Email";
                         appUsers.forEach(appUser => {
                             var user = appUser._embedded.user;
@@ -272,7 +346,7 @@
                 }
                 return strings.join("\n") + "\n";
             }
-            const userPopup = createPopup("User");
+            const userPopup = createPopup("User", false, true);
             const logo = user.credentials.provider.type == "LDAP" ? "ldap_sun_one" : user.credentials.provider.type.toLowerCase();
             userPopup.html(`<span class='icon icon-24 group-logos-24 logo-${logo}'></span><br><br><pre style='font-family: Monaco, Consolas, "Lucida Console", monospace; white-space: pre-wrap; word-break: break-all;'>${e(toString(user))}</pre>`);
         }
@@ -311,7 +385,7 @@
                 }
                 return {id: factor.id, supported: true, sort, radio, type, name, html, inputType, field};
             }
-            const verifyPopup = createPopup("Verify Factors");
+            const verifyPopup = createPopup("Verify Factors", false, true);
             try {
                 var factors = await getJSON(`/api/v1/users/${userId}/factors`);
             } catch (err) {
@@ -382,7 +456,7 @@
                 {type: "API_ACCESS_MANAGEMENT_ADMIN", label: "API Access Management"},
                 {type: "REPORT_ADMIN", label: "Report"}
             ];
-            var rolesPopup = createPopup("Administrator Roles");
+            var rolesPopup = createPopup("Administrator Roles", false, true);
             showRoles();
             function showRoles() {
                 getJSON(`/api/v1/users/${userId}/roles`).then(roles => {
@@ -420,7 +494,7 @@
         });
 
         createDiv("Set Password", mainPopup, function () {
-            const passwordPopup = createPopup("Set Password");
+            const passwordPopup = createPopup("Set Password", false, true);
             const passwordForm = passwordPopup[0].appendChild(document.createElement("form")); // Cuz "<form>" didn't work.
             passwordForm.innerHTML = "<input id=newPassword type=password><br><button class='link-button'>Set</button>";
             newPassword.focus(); // Cuz "autofocus" didn't work.
@@ -441,7 +515,7 @@
         });
 
         createDiv('Show Linked Objects', mainPopup, async function () {
-            const loPopup = createPopup('Linked Objects');
+            const loPopup = createPopup('Linked Objects', false, true);
             const los = await getJson('/api/v1/meta/schemas/user/linkedObjects');
             for (const lo of los) {
                 getLink(lo.primary);
@@ -468,7 +542,7 @@
 
     function directoryGroups() {
         createDiv("Search Groups", mainPopup, function () {
-            var popup = createPopup("Search Groups with Name Containing");
+            var popup = createPopup("Search Groups with Name Containing", false, true);
             var form = $("<form>Name <input class=name style='width: 300px'> " + 
                 "<input type=submit value=Search></form><br><div class=results></div>").appendTo(popup);
             form.submit(event => {
@@ -514,7 +588,7 @@
     
     function securityAdministrators() {
         createDiv("Export Administrators", mainPopup, function () { // TODO: consider merging into exportObjects(). Will the Link headers be a problem?
-            const adminsPopup = createPopup("Administrators");
+            const adminsPopup = createPopup("Administrators", false, true);
             adminsPopup.html('This report has been deprecated. Please use the built-in report.');
         });
     }
@@ -542,7 +616,7 @@
             }
         });        
         createDiv("Export OUs", mainPopup, () => {
-            var ouPopup = createPopup("OUs");
+            var ouPopup = createPopup("OUs", false, true);
             var ous = [];
             exportOUs("user");
             exportOUs("group");
@@ -559,7 +633,7 @@
         createDiv("SAML IdPs", mainPopup, () => {
             getJSON(`/api/v1/idps?type=SAML2`).then(idps => {
                 getJSON('/api/v1/idps/credentials/keys').then(keys => {
-                    var idpPopup = createPopup("SAML IdPs");
+                    var idpPopup = createPopup("SAML IdPs", false, true);
                     var rows = "<tr><th>Name<th>Certificate Expires On<th>Days from today";
                     idps.forEach(idp => {
                         var key = keys.find(key => key.kid == idp.protocol.credentials.trust.kid);
@@ -632,7 +706,7 @@
                 });
             });
             createDiv("Export Apps (custom)", mainPopup, function () {
-                exportPopup = createPopup("Export Apps");
+                exportPopup = createPopup("Export Apps", false, true);
                 exportPopup.append("<br>Columns to export");
                 var checkboxDiv = $("<div style='overflow-y: scroll; height: 152px; width: 300px; border: 1px solid #ccc;'></div>").appendTo(exportPopup);
                 
@@ -748,7 +822,7 @@
         //         "<a href='/admin/access/networks'>Security > Networks</a><br>");
         }
         function exportUsers(o, url, filter) {
-            exportPopup = createPopup("Export " + o);
+            exportPopup = createPopup("Export " + o, false, true);
             exportPopup.append("<br>Columns to export");
             var errorBox = $('<div style="background-color: #ffb;"></div>').appendTo(exportPopup);
             var checkboxDiv = $("<div style='overflow-y: scroll; height: 152px; width: 500px; border: 1px solid #ccc;'></div>").appendTo(exportPopup);
@@ -862,7 +936,7 @@
             total = 0;
             totalBytes = 0;
             objectType = title;
-            exportPopup = createPopup(title);
+            exportPopup = createPopup(title, false, true);
             exportPopup.html("Loading ...");
             template = templateCallback;
             header = headerRow;
@@ -1033,7 +1107,7 @@
                 });
             }
             function getDiv() {
-                ssoPopup = createPopup("SSO");
+                ssoPopup = createPopup("SSO", false, true);
             }
             function indentXml(xml, size) {
                 var lines = xml.split("\n");
@@ -1093,7 +1167,7 @@
                 `<a href='${link.linkUrl}' target='_blank' class='app-button' rel='noopener'>` +
                 `<img src='${link.logoUrl}' class='logo' style='visibility: visible; max-width: 60px;'></a>` +
                 `<p class='app-button-name' style='color: black; width: 100%; text-overflow: clip;'>${link.label}`);
-            createPopup("Apps").html(`<ul>${lis.join('')}</ul>`);
+            createPopup("Apps", false, true).html(`<ul>${lis.join('')}</ul>`);
         });
 
         var qa;
@@ -1126,7 +1200,7 @@
     }
 
     function settings() {
-        const configPopup = createPopup("Configuration");
+        const configPopup = createPopup("Configuration", false, true);
         
         $(`<div class="infobox clearfix infobox-info">` +
             `<span class="icon info-16"></span>` +
@@ -1159,7 +1233,7 @@
     
     // Generic function to create a popup with search bar
     function createPopupWithSearch(popupTitle, searchPlaceholder) {
-        const logListPopup = createPopup(popupTitle);
+        const logListPopup = createPopup(popupTitle, false, true);
         logListPopup.parent().attr('id', 'logListPopup');
         const searchInputHTML = `<input type='text' id='userSearch' style='margin-bottom: 10px' placeholder='${searchPlaceholder}'>`;
         logListPopup.prepend(searchInputHTML);
@@ -1257,7 +1331,7 @@
     // API functions
     function apiExplorer() {
         createDiv("API Explorer", mainPopup, function () {
-            var apiPopup = createPopup("API Explorer");
+            var apiPopup = createPopup("API Explorer", false, true);
             var form = apiPopup[0].appendChild(document.createElement("form"));
             form.innerHTML = "<select id=method><option>GET<option>POST<option>PUT<option>PATCH<option>DELETE</select> " +
                 "<input id=url list=urls> "; // HACK: input.list is read-only, must set it at create time. :(
@@ -1417,17 +1491,27 @@
         var xsrf = $("#_xsrfToken");
         if (xsrf.length) $.ajaxSetup({headers: {"X-Okta-XsrfToken": xsrf.text()}});
     }
-    function createPopup(title, main) {
+    function createPopup(title, main, draggable) {
         function toggleClosed() {
             popupBody.toggleClass('rs_closed');
         }
-        function toggleSide() {
-            popup.toggleClass('rs_toggle');
+        
+        // Get stored position or use defaults
+        let position = {left: '4px', top: '0px'};
+        const positionKey = 'rockstarPosition_' + (main ? 'main' : title.replace(/[^a-zA-Z0-9]/g, ''));
+        
+        if (localStorage[positionKey]) {
+            try {
+                position = JSON.parse(localStorage[positionKey]);
+            } catch (e) {
+                // If parsing fails, use defaults
+            }
         }
-        const popup = $(`<div style='position: absolute; z-index: 1000; top: 0px; max-height: calc(100% - 28px); max-width: calc(100% - 28px); padding: 8px; margin: 4px; overflow: auto; ` +
+        
+        const popup = $(`<div class='rockstar-popup' style='position: absolute; z-index: 1000; left: ${position.left}; top: ${position.top}; max-height: calc(100% - 28px); max-width: calc(100% - 28px); padding: 8px; margin: 4px; overflow: auto; ` +
                 `background-color: white; border: 1px solid #ddd;'>` +
                 `${main ? "<span class=title><span style='font-size: 18px;'>≡</span> " : "<span style='font-weight: bold'>"}${title}</span>` +
-                `<div class='rockstarButtons' style='display: block; float: right;'>${main ? "<span class=toggleSide style='padding: 4px'> ⇄ </span><span class=minimize style='padding: 4px'> _ </span>" : ""} ` + 
+                `<div class='rockstarButtons' style='display: block; float: right;'>${main ? "<span class=minimize style='padding: 4px'> _ </span>" : ""} ` + 
                 (main ? `<a class='whatsNew'><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-wclassth="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg></a>` : '') +
                 (main ? `<a class='settings'><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M10.343 3.94c.09-.542.56-.94 1.11-.94h1.093c.55 0 1.02.398 1.11.94l.149.894c.07.424.384.764.78.93.398.164.855.142 1.205-.108l.737-.527a1.125 1.125 0 0 1 1.45.12l.773.774c.39.389.44 1.002.12 1.45l-.527.737c-.25.35-.272.806-.107 1.204.165.397.505.71.93.78l.893.15c.543.09.94.559.94 1.109v1.094c0 .55-.397 1.02-.94 1.11l-.894.149c-.424.07-.764.383-.929.78-.165.398-.143.854.107 1.204l.527.738c.32.447.269 1.06-.12 1.45l-.774.773a1.125 1.125 0 0 1-1.449.12l-.738-.527c-.35-.25-.806-.272-1.203-.107-.398.165-.71.505-.781.929l-.149.894c-.09.542-.56.94-1.11.94h-1.094c-.55 0-1.019-.398-1.11-.94l-.148-.894c-.071-.424-.384-.764-.781-.93-.398-.164-.854-.142-1.204.108l-.738.527c-.447.32-1.06.269-1.45-.12l-.773-.774a1.125 1.125 0 0 1-.12-1.45l.527-.737c.25-.35.272-.806.108-1.204-.165-.397-.506-.71-.93-.78l-.894-.15c-.542-.09-.94-.56-.94-1.109v-1.094c0-.55.398-1.02.94-1.11l.894-.149c.424-.07.765-.383.93-.78.165-.398.143-.854-.108-1.204l-.526-.738a1.125 1.125 0 0 1 .12-1.45l.773-.773a1.125 1.125 0 0 1 1.45-.12l.737.527c.35.25.807.272 1.204.107.397-.165.71-.505.78-.929l.15-.894Z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" /></svg></a> ` : '') + 
                 `<a href='https://gabrielsroka.github.io/rockstar/' target='_blank' rel='noopener'>?</a> ` + 
@@ -1435,20 +1519,52 @@
             .appendTo(document.body);
         const popupBody = $("<div></div>").appendTo(popup);
         popup.find('.close').click(() => popup.remove());
-        if (main) {
-            popup.find('.title').click(toggleClosed);
+        if (main || draggable) {
+            // Simple drag functionality - drag from anywhere on popup
+            let isDragging = false;
+            let startX, startY, startLeft, startTop;
+            
+            popup.on('mousedown', function(e) {
+                // Don't drag when clicking buttons, links, or interactive elements
+                if (e.target.closest('.rockstarButtons, a, button, input, select, textarea')) return;
+                
+                isDragging = true;
+                startX = e.clientX;
+                startY = e.clientY;
+                startLeft = parseInt(popup.css('left'), 10) || 0;
+                startTop = parseInt(popup.css('top'), 10) || 0;
+                
+                e.preventDefault();
+                $(document).on('mousemove.drag', function(e) {
+                    if (!isDragging) return;
+                    
+                    let newLeft = startLeft + e.clientX - startX;
+                    let newTop = startTop + e.clientY - startY;
+                    
+                    popup.css({left: newLeft + 'px', top: newTop + 'px'});
+                });
+                
+                $(document).on('mouseup.drag', function() {
+                    isDragging = false;
+                    $(document).off('.drag');
+                    
+                    // Save the new position to localStorage
+                    const currentPosition = {
+                        left: popup.css('left'),
+                        top: popup.css('top')
+                    };
+                    localStorage[positionKey] = JSON.stringify(currentPosition);
+                });
+            });
+            
+            // Only allow minimize/maximize through the dedicated _ button, not the title
             popup.find('.minimize').click(() => {
                 toggleClosed();
                 localStorage.rockstarClosed = localStorage.rockstarClosed ? '' : 'true';
             });
-            popup.find('.toggleSide').click(() => {
-                toggleSide();
-                localStorage.rockstarToggleSide = localStorage.rockstarToggleSide ? '' : 'true';
-            });
             popup.find('.whatsNew').click(whatsNew);
             popup.find('.settings').click(settings);
             if (localStorage.rockstarClosed) toggleClosed();
-            if (localStorage.rockstarToggleSide) toggleSide();
         }
         return popupBody;
     }
