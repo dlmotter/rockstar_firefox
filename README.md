@@ -34,6 +34,17 @@ This is the Firefox-compatible version of the rockstar Okta extension.
   - Self-contained with real-time search functionality
   - Clean table display with working user profile links
   - Better error handling and visual feedback
+- **Enhanced Search Groups**: "Search Groups (experimental)" now opens in its own draggable popup
+  - Dedicated popup interface for group searching
+  - Real-time group search with clean results display
+  - Working group profile links and better visual feedback
+- **Expanded API Explorer**: Comprehensive autocomplete suggestions for Okta APIs
+  - 200+ endpoint suggestions covering all major Okta API categories
+  - Includes Management API endpoints (users, groups, apps, policies, etc.)
+  - OAuth 2.0 and OpenID Connect endpoints with proper naming conventions
+  - Well-known discovery endpoints and organization metadata
+  - Smart variable placeholders (${userId}, ${groupId}, ${clientId}, etc.)
+  - Covers authentication, authorization, security policies, and system management
 
 ### Files Modified
 - `manifest.json` - Converted to Manifest V2 format, removed unsupported permissions
