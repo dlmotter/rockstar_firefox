@@ -27,6 +27,12 @@
 .rockstar-popup textarea {
     cursor: pointer;
 }
+.rockstar-popup pre,
+.rockstar-popup table,
+.rockstar-popup td,
+.rockstar-popup th {
+    cursor: text;
+}
 .rockstar-popup .close {
     cursor: pointer;
 }

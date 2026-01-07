@@ -1617,8 +1617,8 @@
             let startX, startY, startLeft, startTop;
             
             popup.on('mousedown', function(e) {
-                // Don't drag when clicking buttons, links, or interactive elements
-                if (e.target.closest('.rockstarButtons, a, button, input, select, textarea')) return;
+                // Don't drag when clicking buttons, links, or interactive elements, or text that should be selectable
+                if (e.target.closest('.rockstarButtons, a, button, input, select, textarea, pre, table, td, th')) return;
                 
                 isDragging = true;
                 startX = e.clientX;
