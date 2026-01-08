@@ -5,7 +5,7 @@
   "description": "rockstar adds a bunch of great features to Okta, like exporting to a CSV.",
   "browser_specific_settings": {
     "gecko": {
-      "id": "34d003a4-9713-44f9-ba98-c08eeac8ce5b",
+      "id": "{34d003a4-9713-44f9-ba98-c08eeac8ce5b}",
       "data_collection_permissions": {
         "required": ["none"],
         "optional": []
