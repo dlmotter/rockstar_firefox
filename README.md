@@ -13,6 +13,13 @@ This is the Firefox-compatible version of the [Rockstar Okta extension](https://
   - Each popup type saves its position independently in localStorage
   - Position is restored when reopening the same popup type on any Okta page
   - Works across different Okta admin pages and user sessions
+- **Customizable Popup Themes**: Personalize popup appearance with custom background colors
+  - Click the settings gear icon to choose from preset colors or enter custom hex values
+  - Automatic text color adaptation (white text on dark backgrounds, black on light)
+  - Adaptive border colors for better visibility on all theme combinations
+  - Theme preferences persist across sessions and apply to all popups
+  - Comprehensive CSS overrides ensure consistent theming throughout the interface
+  - Useful for visually distinguishing different Okta environments (e.g., red for production, blue for staging, green for development)
 - **Enhanced Experimental Searches**: "Search Users (experimental)" and "Search Groups (experimental)" now open in their own draggable popup
   - No longer hijacks the page's existing search interface
   - Self-contained with real-time search functionality
