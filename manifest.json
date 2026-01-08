@@ -3,6 +3,13 @@
   "name": "rockstar",
   "version": "3.2",
   "description": "rockstar adds a bunch of great features to Okta, like exporting to a CSV.",
+  "data_collection_permissions": {
+    "collect_personal_data": false,
+    "collect_browsing_history": false,
+    "collect_website_content": false,
+    "collect_cookies": false,
+    "collect_location": false
+  },
   "omnibox": {
     "keyword": "rs"
   },
