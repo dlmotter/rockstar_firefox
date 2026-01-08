@@ -13,14 +13,10 @@
     font-weight: bold;
     user-select: none;
 }
-.title:hover {
-    background-color: #e8e8e8;
-}
 .rockstar-popup {
     cursor: move;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
     border-radius: 6px;
-    background-color: #f0f8ff;
     border: 1px solid #d1d9e6;
 }
 .rockstar-popup .rockstarButtons span,
@@ -40,24 +36,151 @@
 .rockstar-popup .close {
     cursor: pointer;
 }
-.rs_closed {
-    display: none;
+/* Make text elements inherit the popup's text color, but allow dynamic updates */
+.rockstar-popup {
+    color: inherit;
 }
+.rockstar-popup span,
+.rockstar-popup div,
+.rockstar-popup p,
+.rockstar-popup td,
+.rockstar-popup th,
+.rockstar-popup pre,
+.rockstar-popup h1,
+.rockstar-popup h2,
+.rockstar-popup h3,
+.rockstar-popup h4,
+.rockstar-popup h5,
+.rockstar-popup h6 {
+    color: inherit;
+}
+/* Special handling for links - make them visible but still inherit base color */
+.rockstar-popup a {
+    color: inherit;
+    text-decoration: underline;
+}
+/* Exception: Infoboxes have white backgrounds, so text should always be dark */
+.rockstar-popup .infobox,
+.rockstar-popup .infobox * {
+    color: #333 !important;
+}
+/* Ensure API Explorer results maintain proper text color */
+.rockstar-popup pre {
+    color: inherit !important;
+    background-color: transparent !important;
+}
+.rockstar-popup .data-list-table {
+    color: inherit !important;
+    background-color: transparent !important;
+}
+.rockstar-popup .data-list-table td,
+.rockstar-popup .data-list-table th {
+    color: inherit !important;
+    background-color: transparent !important;
+}
+/* Override any inline styles that might affect API results */
+.rockstar-popup pre *,
+.rockstar-popup table *,
+.rockstar-popup tr,
+.rockstar-popup td,
+.rockstar-popup th {
+    color: inherit !important;
+}
+/* Force API Explorer results to be visible - very high specificity */
+.rockstar-popup pre[style],
+.rockstar-popup pre[style] *,
+div.rockstar-popup pre,
+div.rockstar-popup pre *,
+div.rockstar-popup table,
+div.rockstar-popup table * {
+    color: inherit !important;
+    background: transparent !important;
+}
+/* Emergency override for any white text */
+.rockstar-popup *[style*="color: white"],
+.rockstar-popup *[style*="color:#fff"],
+.rockstar-popup *[style*="color: #fff"],
+.rockstar-popup *[style*="color:#ffffff"],
+.rockstar-popup *[style*="color: #ffffff"] {
+    color: inherit !important;
+}
+/* Override any remaining problematic colors */
+.rockstar-popup *[style*="color: red"],
+.rockstar-popup *[style*="color: black"],
+.rockstar-popup *[style*="background-color: yellow"],
+.rockstar-popup *[style*="background-color: red"] {
+    color: inherit !important;
+    background-color: transparent !important;
+}
+/* Remove underlines from header buttons (?, X, settings, etc.) */
+.rockstarButtons a {
+    text-decoration: none;
+}
+/* Make form buttons inherit text color and have consistent styling */
+.rockstar-popup input[type="submit"],
+.rockstar-popup input[type="button"],
+.rockstar-popup button,
+.rockstar-popup .button-primary,
+.rockstar-popup .link-button {
+    color: inherit;
+    background-color: transparent;
+    border: 1px solid currentColor;
+    padding: 6px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.rockstar-popup input[type="submit"]:hover,
+.rockstar-popup input[type="button"]:hover,
+.rockstar-popup button:hover,
+.rockstar-popup .button-primary:hover,
+.rockstar-popup .link-button:hover {
+    background-color: var(--hover-color, rgba(0,0,0,0.1));
+}
+/* Style tables in search results */
+.rockstar-popup table {
+    border: 1px solid currentColor;
+}
+/* Remove border from API Explorer headers table */
+.rockstar-popup table:not(.data-list-table) {
+    border: none;
+}
+.rockstar-popup table:not(.data-list-table) td,
+.rockstar-popup table:not(.data-list-table) th {
+    border: none;
+}
+.rockstar-popup th {
+    background-color: var(--hover-color, rgba(0,0,0,0.1));
+    font-weight: bold;
+    border-bottom: 1px solid currentColor;
+}
+.rockstar-popup td {
+    border-bottom: 1px solid var(--hover-color, rgba(0,0,0,0.1));
+}
+.rockstar-popup tr:hover {
+    background-color: var(--hover-color, rgba(0,0,0,0.1));
+}
+/* Hover state should adapt to background */
 .hoverDiv {
     cursor: pointer;
     padding: 5px;
+    transition: background-color 0.2s;
 }
-.hoverDiv:hover {
-  background-color: #f0f0f0;
+.rockstar-popup .hoverDiv:hover {
+    background-color: var(--hover-color, #f0f0f0) !important;
+}
+.rs_closed {
+    display: none;
 }
 
 .rockstarButtons a {
   font-size: 18px; 
   padding: 4px; 
   cursor: pointer;
+  color: inherit;
 }
 
 .rockstarButtons a svg {
   height: 20px; 
   vertical-align: text-top;
+  stroke: currentColor;
 }

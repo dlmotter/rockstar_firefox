@@ -201,7 +201,7 @@
 
     function whatsNew() {
         const newsPopup = createPopup("What's New", false, true);
-        $(`<h1 style='padding: 5px'>2024-06-11</h1>`).appendTo(newsPopup);
+        $(`<h1 style='padding: 5px; font-weight: bold;'>2024-06-11</h1>`).appendTo(newsPopup);
         $(`<div style='padding: 5px'>` +
             `• See Deleted Users, Apps, and Groups.<br/>` +
             `• Restore Deleted Users, Apps, and Groups with Backupta.` +
@@ -221,10 +221,10 @@
                 <div style="margin-bottom: 10px;">
                     <input type="text" id="userSearchInput" placeholder="Search Active by First/Last/Email..." 
                            style="width: 300px; padding: 5px; border: 1px solid #ccc; border-radius: 3px;">
-                    <span style="margin-left: 10px; font-size: 12px; color: #666;">Min 2 characters, max 15 results</span>
+                    <span style="margin-left: 10px; font-size: 12px;">Min 2 characters, max 15 results</span>
                 </div>
                 <div id="userSearchResults">
-                    <p style="color: #666; font-style: italic;">Enter at least 2 characters to search...</p>
+                    <p style="font-style: italic;">Enter at least 2 characters to search...</p>
                 </div>
             `;
             
@@ -237,13 +237,13 @@
                 const resultsDiv = searchPopup.find('#userSearchResults');
                 
                 if (searchTerm.length < 2) {
-                    resultsDiv.html('<p style="color: #666; font-style: italic;">Enter at least 2 characters to search...</p>');
+                    resultsDiv.html('<p style="font-style: italic;">Enter at least 2 characters to search...</p>');
                     return;
                 }
                 
                 clearTimeout(timeoutID);
                 timeoutID = setTimeout(() => {
-                    resultsDiv.html('<p style="color: #666;">Searching...</p>');
+                    resultsDiv.html('<p>Searching...</p>');
                     
                     $.get({
                         url: location.origin + "/api/v1/users",
@@ -251,7 +251,7 @@
                         headers
                     }).then(users => {
                         if (users.length === 0) {
-                            resultsDiv.html('<p style="color: #666;">No users found.</p>');
+                            resultsDiv.html('<p>No users found.</p>');
                             return;
                         }
                         
@@ -261,11 +261,11 @@
                         let tableHTML = `
                             <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
                                 <thead>
-                                    <tr style="background: #f5f5f5;">
-                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Source</th>
-                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Name</th>
-                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Username</th>
-                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Email</th>
+                                    <tr>
+                                        <th style="padding: 8px; text-align: left;">Source</th>
+                                        <th style="padding: 8px; text-align: left;">Name</th>
+                                        <th style="padding: 8px; text-align: left;">Username</th>
+                                        <th style="padding: 8px; text-align: left;">Email</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -277,18 +277,18 @@
                             const sourceName = creds.name == "OKTA" ? "Okta" : creds.name;
                             
                             tableHTML += `
-                                <tr style="border-bottom: 1px solid #eee;">
-                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                <tr>
+                                    <td style="padding: 8px;">
                                         <span class='icon icon-24 group-logos-24 logo-${logo}' title="${sourceName}"></span> ${sourceName}
                                     </td>
-                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                    <td style="padding: 8px;">
                                         <a href="/admin/user/profile/view/${e(user.id)}#tab-account" 
-                                           target="_blank" style="color: #0073e6; text-decoration: none;">
+                                           target="_blank">
                                             ${e(user.profile.firstName)} ${e(user.profile.lastName)}
                                         </a>
                                     </td>
-                                    <td style="padding: 8px; border: 1px solid #ddd;">${e(user.profile.login)}</td>
-                                    <td style="padding: 8px; border: 1px solid #ddd;">${e(user.profile.email)}</td>
+                                    <td style="padding: 8px;">${e(user.profile.login)}</td>
+                                    <td style="padding: 8px;">${e(user.profile.email)}</td>
                                 </tr>
                             `;
                         });
@@ -298,7 +298,7 @@
                         
                     }).catch(error => {
                         console.error('Search error:', error);
-                        resultsDiv.html('<p style="color: red;">Error searching users. Please try again.</p>');
+                        resultsDiv.html('<p style="font-weight: bold;">Error searching users. Please try again.</p>');
                     });
                 }, 400);
             });
@@ -570,10 +570,10 @@
                 <div style="margin-bottom: 10px;">
                     <input type="text" id="groupSearchInput" placeholder="Search name with wildcard..." 
                            style="width: 300px; padding: 5px; border: 1px solid #ccc; border-radius: 3px;">
-                    <span style="margin-left: 10px; font-size: 12px; color: #666;">Enter text to search group names</span>
+                    <span style="margin-left: 10px; font-size: 12px;">Enter text to search group names</span>
                 </div>
                 <div id="groupSearchResults">
-                    <p style="color: #666; font-style: italic;">Enter search text to find groups...</p>
+                    <p style="font-style: italic;">Enter search text to find groups...</p>
                 </div>
             `;
             
@@ -586,13 +586,13 @@
                 const resultsDiv = searchPopup.find('#groupSearchResults');
                 
                 if (searchTerm.length === 0) {
-                    resultsDiv.html('<p style="color: #666; font-style: italic;">Enter search text to find groups...</p>');
+                    resultsDiv.html('<p style="font-style: italic;">Enter search text to find groups...</p>');
                     return;
                 }
                 
                 clearTimeout(timeoutID);
                 timeoutID = setTimeout(() => {
-                    resultsDiv.html('<p style="color: #666;">Searching groups...</p>');
+                    resultsDiv.html('<p>Searching groups...</p>');
                     
                     $.get({
                         url: location.origin + "/api/v1/groups",
@@ -604,7 +604,7 @@
                         const filteredGroups = groups.filter(group => group.profile.name.match(searchRegex));
                         
                         if (filteredGroups.length === 0) {
-                            resultsDiv.html('<p style="color: #666;">No groups found matching your search.</p>');
+                            resultsDiv.html('<p>No groups found matching your search.</p>');
                             return;
                         }
                         
@@ -614,13 +614,13 @@
                         let tableHTML = `
                             <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
                                 <thead>
-                                    <tr style="background: #f5f5f5;">
-                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Source</th>
-                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Name</th>
-                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Description</th>
-                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">People</th>
-                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Apps</th>
-                                        <th style="padding: 8px; text-align: left; border: 1px solid #ddd;">Directories</th>
+                                    <tr>
+                                        <th style="padding: 8px; text-align: left;">Source</th>
+                                        <th style="padding: 8px; text-align: left;">Name</th>
+                                        <th style="padding: 8px; text-align: left;">Description</th>
+                                        <th style="padding: 8px; text-align: left;">People</th>
+                                        <th style="padding: 8px; text-align: left;">Apps</th>
+                                        <th style="padding: 8px; text-align: left;">Directories</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -634,19 +634,19 @@
                             const directoriesCount = group._embedded.stats.groupPushMappingsCount;
                             
                             tableHTML += `
-                                <tr style="border-bottom: 1px solid #eee;">
-                                    <td style="padding: 8px; border: 1px solid #ddd;">
+                                <tr>
+                                    <td style="padding: 8px;">
                                         <span class='icon icon-24 group-logos-24 logo-${logo}'></span>
                                     </td>
-                                    <td style="padding: 8px; border: 1px solid #ddd;">
-                                        <a href="/admin/group/${group.id}" target="_blank" style="color: #0073e6; text-decoration: none;">
+                                    <td style="padding: 8px;">
+                                        <a href="/admin/group/${group.id}" target="_blank">
                                             ${e(group.profile.name)}
                                         </a>
                                     </td>
-                                    <td style="padding: 8px; border: 1px solid #ddd;">${e(description)}</td>
-                                    <td style="padding: 8px; border: 1px solid #ddd;">${peopleCount}</td>
-                                    <td style="padding: 8px; border: 1px solid #ddd;">${appsCount}</td>
-                                    <td style="padding: 8px; border: 1px solid #ddd;">${directoriesCount}</td>
+                                    <td style="padding: 8px;">${e(description)}</td>
+                                    <td style="padding: 8px;">${peopleCount}</td>
+                                    <td style="padding: 8px;">${appsCount}</td>
+                                    <td style="padding: 8px;">${directoriesCount}</td>
                                 </tr>
                             `;
                         });
@@ -659,7 +659,7 @@
                         
                     }).catch(error => {
                         console.error('Group search error:', error);
-                        resultsDiv.html('<p style="color: red;">Error searching groups. Please try again.</p>');
+                        resultsDiv.html('<p style="font-weight: bold;">Error searching groups. Please try again.</p>');
                     });
                 }, 400);
             });
@@ -721,8 +721,8 @@
                     idps.forEach(idp => {
                         var key = keys.find(key => key.kid == idp.protocol.credentials.trust.kid);
                         var days = Math.trunc((new Date(key.expiresAt) - new Date()) / 1000 / 60 / 60 / 24);
-                        var style = days < 30 ? "style='background-color: red; color: white'" : "";
-                        rows += `<tr><td>${e(idp.name)}<td>${e(key.expiresAt)}<td ${style}}'>${days}`;
+                        var style = days < 30 ? "style='font-weight: bold;'" : "";
+                        rows += `<tr><td>${e(idp.name)}<td>${e(key.expiresAt)}<td ${style}>${days}`;
                     });
                     idpPopup.html(`<table class='data-list-table' style='border: 1px solid #ddd;'>${rows}</table>`);
                 });
@@ -907,7 +907,7 @@
         function exportUsers(o, url, filter) {
             exportPopup = createPopup("Export " + o, false, true);
             exportPopup.append("<br>Columns to export");
-            var errorBox = $('<div style="background-color: #ffb;"></div>').appendTo(exportPopup);
+            var errorBox = $('<div style="padding: 10px; border: 1px solid currentColor; border-radius: 4px; margin-bottom: 10px;"></div>').appendTo(exportPopup);
             var checkboxDiv = $("<div style='overflow-y: scroll; height: 152px; width: 500px; border: 1px solid #ccc;'></div>").appendTo(exportPopup);
             
             function addCheckbox(value, text) {
@@ -1166,7 +1166,7 @@
                     function unentity(s) {
                         return s.replace(/&#(x..?);/g, (m, p1) => String.fromCharCode("0" + p1));
                     }
-                    var highlight = "style='background-color: yellow'";
+                    var highlight = "style='font-weight: bold;'";
                     var matches;
                     if (matches = response.match(/name="(SAMLResponse|wresult)".*value="(.*?)"/)) {
                         var assertion = unentity(matches[2]);
@@ -1249,7 +1249,7 @@
             const lis = links.map(link => `<li class='app-button-wrapper' style='width: 64px;'>` +
                 `<a href='${link.linkUrl}' target='_blank' class='app-button' rel='noopener'>` +
                 `<img src='${link.logoUrl}' class='logo' style='visibility: visible; max-width: 60px;'></a>` +
-                `<p class='app-button-name' style='color: black; width: 100%; text-overflow: clip;'>${link.label}`);
+                `<p class='app-button-name' style='width: 100%; text-overflow: clip;'>${link.label}`);
             createPopup("Apps", false, true).html(`<ul>${lis.join('')}</ul>`);
         });
 
@@ -1295,6 +1295,9 @@
         // Create the input element and set the default value
         const backuptaUrlDiv = $("<div style='padding: 5px'>Backupta base URL: </div>").appendTo(configPopup);
         
+        // Background color setting
+        const bgColorDiv = $("<div style='padding: 5px'>Popup Background Color: </div>").appendTo(configPopup);
+        
         const saveDiv = $("<div style='padding: 5px'></div>").appendTo(configPopup);
         const saveButton = $("<input type='submit' value='Save' class='button-primary link-button' disabled />")
             .appendTo(saveDiv)
@@ -1302,6 +1305,27 @@
                 const val = $('#backuptaUrlInput').val().replace(/\/$/, "");
                 $('#backuptaUrlInput').val(val);
                 localStorage.backuptaBaseUrl = $('#backuptaUrlInput').val();
+                
+                const newBgColor = $('#popupBgColorInput').val();
+                localStorage.rockstarPopupBgColor = newBgColor;
+                
+                // Generate adaptive border color and appropriate text color
+                const textColor = getTextColor(newBgColor);
+                const borderColor = getBorderColor(newBgColor, textColor);
+                const hoverColor = getHoverColor(newBgColor, textColor);
+                
+                // Apply the new background, border, text, and hover color to all existing popups immediately
+                $('.rockstar-popup').each(function() {
+                    const popup = $(this);
+                    popup.css({
+                        'background-color': newBgColor,
+                        'border-color': borderColor,
+                        'color': textColor
+                    });
+                    // Set CSS custom property using native DOM method for better compatibility
+                    this.style.setProperty('--hover-color', hoverColor);
+                });
+                
                 saveButton.attr('disabled', true);
             });
 
@@ -1309,9 +1333,16 @@
             .val(localStorage.backuptaBaseUrl) // Set the default value
             .appendTo(backuptaUrlDiv)
             .keyup(function () {
-                saveButton.attr('disabled', $(this).val() == localStorage.backuptaBaseUrl);
+                saveButton.attr('disabled', $(this).val() == localStorage.backuptaBaseUrl || $('#popupBgColorInput').val() != (localStorage.rockstarPopupBgColor || '#f0f8ff'));
             })
             .focus();
+            
+        $("<input type='color' id='popupBgColorInput' title='Choose popup background color'>")
+            .val(localStorage.rockstarPopupBgColor || '#f0f8ff') // Set the default value
+            .appendTo(bgColorDiv)
+            .change(function () {
+                saveButton.attr('disabled', $('#backuptaUrlInput').val() == localStorage.backuptaBaseUrl && $(this).val() == (localStorage.rockstarPopupBgColor || '#f0f8ff'));
+            });
     }
     
     // Generic function to create a popup with search bar
@@ -1415,7 +1446,7 @@
     function apiExplorer() {
         createDiv("API Explorer", mainPopup, function () {
             var apiPopup = createPopup("API Explorer", false, true);
-            var form = apiPopup[0].appendChild(document.createElement("form"));
+            var form = $("<form></form>").appendTo(apiPopup)[0];
             form.innerHTML = "<select id=method><option>GET<option>POST<option>PUT<option>PATCH<option>DELETE</select> " +
                 "<input id=url list=urls> "; // HACK: input.list is read-only, must set it at create time. :(
             var url = form.querySelector('#url');
@@ -1445,9 +1476,9 @@
             form.appendChild(document.createElement("div")).innerHTML = "<br>Body";
             var data = form.appendChild(document.createElement("textarea"));
             data.style.width = "850px";
-            var results = form.appendChild(document.createElement("div"));
+            var results = $("<div></div>").appendTo(apiPopup)[0];
             form.onsubmit = function () {
-                $(results).html("<br>Loading ...");
+                $(results).html("Loading ...");
                 var urlValue = url.value;
                 if (urlValue.match(/\${.*}/) && location.pathname.match("/admin/(app|group|user)/")) {
                     var parts = location.pathname.split('/');
@@ -1583,6 +1614,57 @@
         var xsrf = $("#_xsrfToken");
         if (xsrf.length) $.ajaxSetup({headers: {"X-Okta-XsrfToken": xsrf.text()}});
     }
+    
+    // Helper function to darken a hex color by a percentage
+    function darkenColor(color, percent) {
+        const num = parseInt(color.replace("#", ""), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = Math.max(0, (num >> 16) - amt);
+        const G = Math.max(0, (num >> 8 & 0x00FF) - amt);
+        const B = Math.max(0, (num & 0x0000FF) - amt);
+        return "#" + (0x1000000 + (R << 16) + (G << 8) + B).toString(16).slice(1);
+    }
+    
+    // Helper function to determine if text should be black or white based on background color
+    function getTextColor(backgroundColor) {
+        const hex = backgroundColor.replace('#', '');
+        const r = parseInt(hex.substr(0, 2), 16);
+        const g = parseInt(hex.substr(2, 2), 16);
+        const b = parseInt(hex.substr(4, 2), 16);
+        
+        // Calculate luminance using standard formula
+        const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        
+        // Return black for light backgrounds, white for dark backgrounds
+        return luminance > 0.5 ? '#000000' : '#ffffff';
+    }
+    
+    // Helper function to generate hover color based on background
+    function getHoverColor(backgroundColor, textColor) {
+        // For light backgrounds (black text), use a darker hover
+        // For dark backgrounds (white text), use a lighter hover
+        const isLightBg = textColor === '#000000';
+        return isLightBg ? darkenColor(backgroundColor, 15) : lightenColor(backgroundColor, 15);
+    }
+    
+    // Helper function to generate border color based on background
+    function getBorderColor(backgroundColor, textColor) {
+        // For light backgrounds (black text), use a darker border
+        // For dark backgrounds (white text), use a lighter border for better contrast
+        const isLightBg = textColor === '#000000';
+        return isLightBg ? darkenColor(backgroundColor, 20) : lightenColor(backgroundColor, 30);
+    }
+    
+    // Helper function to lighten a hex color by a percentage
+    function lightenColor(color, percent) {
+        const num = parseInt(color.replace("#", ""), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = Math.min(255, (num >> 16) + amt);
+        const G = Math.min(255, (num >> 8 & 0x00FF) + amt);
+        const B = Math.min(255, (num & 0x0000FF) + amt);
+        return "#" + (0x1000000 + (R << 16) + (G << 8) + B).toString(16).slice(1);
+    }
+    
     function createPopup(title, main, draggable) {
         function toggleClosed() {
             popupBody.toggleClass('rs_closed');
@@ -1600,7 +1682,13 @@
             }
         }
         
-        const popup = $(`<div class='rockstar-popup' style='position: absolute; z-index: 1000; left: ${position.left}; top: ${position.top}; max-height: calc(100% - 28px); max-width: calc(100% - 28px); padding: 8px; margin: 4px; overflow: auto;'>` +
+        // Get user's preferred background color or use default
+        const bgColor = localStorage.rockstarPopupBgColor || '#f0f8ff';
+        const textColor = getTextColor(bgColor);
+        const borderColor = getBorderColor(bgColor, textColor);
+        const hoverColor = getHoverColor(bgColor, textColor);
+        
+        const popup = $(`<div class='rockstar-popup' style='position: absolute; z-index: 1000; left: ${position.left}; top: ${position.top}; max-height: calc(100vh - 40px); max-width: calc(100vw - 40px); padding: 8px; margin: 4px; overflow: auto; background-color: ${bgColor}; border-color: ${borderColor}; color: ${textColor}; --hover-color: ${hoverColor}; box-sizing: border-box;'>` +
                 `${main ? "<span class=title><span style='font-size: 18px;'>≡</span> " : "<span style='font-weight: bold'>"}${title}</span>` +
                 `<div class='rockstarButtons' style='display: block; float: right;'>${main ? "<span class=minimize style='padding: 4px'> _ </span>" : ""} ` + 
                 (main ? `<a class='whatsNew'><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-wclassth="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M21 11.25v8.25a1.5 1.5 0 0 1-1.5 1.5H5.25a1.5 1.5 0 0 1-1.5-1.5v-8.25M12 4.875A2.625 2.625 0 1 0 9.375 7.5H12m0-2.625V7.5m0-2.625A2.625 2.625 0 1 1 14.625 7.5H12m0 0V21m-8.625-9.75h18c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125h-18c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125Z" /></svg></a>` : '') +
@@ -1608,6 +1696,43 @@
                 `<a href='https://gabrielsroka.github.io/rockstar/' target='_blank' rel='noopener'>?</a> ` + 
                 `<a class=close>X</a></div><br><br></div>`)
             .appendTo(document.body);
+        
+        // Ensure popup stays within viewport bounds
+        function constrainToViewport() {
+            const rect = popup[0].getBoundingClientRect();
+            const viewportWidth = window.innerWidth;
+            const viewportHeight = window.innerHeight;
+            
+            let newLeft = parseInt(popup.css('left'), 10);
+            let newTop = parseInt(popup.css('top'), 10);
+            
+            // Adjust if popup goes off the right edge
+            if (rect.right > viewportWidth) {
+                newLeft = viewportWidth - rect.width - 20;
+            }
+            // Adjust if popup goes off the left edge
+            if (rect.left < 0) {
+                newLeft = 20;
+            }
+            // Adjust if popup goes off the bottom edge
+            if (rect.bottom > viewportHeight) {
+                newTop = viewportHeight - rect.height - 20;
+            }
+            // Adjust if popup goes off the top edge
+            if (rect.top < 0) {
+                newTop = 20;
+            }
+            
+            // Apply constraints
+            popup.css({
+                left: Math.max(20, newLeft) + 'px',
+                top: Math.max(20, newTop) + 'px'
+            });
+        }
+        
+        // Apply initial constraints
+        setTimeout(constrainToViewport, 0);
+        
         const popupBody = $("<div></div>").appendTo(popup);
         popup.find('.close').click(() => popup.remove());
         if (main || draggable) {
@@ -1631,6 +1756,15 @@
                     
                     let newLeft = startLeft + e.clientX - startX;
                     let newTop = startTop + e.clientY - startY;
+                    
+                    // Apply viewport constraints during drag
+                    const viewportWidth = window.innerWidth;
+                    const viewportHeight = window.innerHeight;
+                    const rect = popup[0].getBoundingClientRect();
+                    
+                    // Constrain to viewport bounds
+                    newLeft = Math.max(20, Math.min(newLeft, viewportWidth - rect.width - 20));
+                    newTop = Math.max(20, Math.min(newTop, viewportHeight - rect.height - 20));
                     
                     popup.css({left: newLeft + 'px', top: newTop + 'px'});
                 });
