@@ -7,11 +7,8 @@
     "gecko": {
       "id": "rockstar@dlmotter.github.io",
       "data_collection_permissions": {
-        "collect_personal_data": false,
-        "collect_browsing_history": false,
-        "collect_website_content": false,
-        "collect_cookies": false,
-        "collect_location": false
+        "required": "none",
+        "optional": []
       }
     }
   },
