@@ -1510,7 +1510,8 @@
                                     send.click();
                                 });
                             }
-                            $(results).append("<br>" + table.body);
+                            // Wrap table in horizontally scrollable container
+                            $(results).append("<br><div style='overflow-x: auto; max-width: 100%;'>" + table.body + "</div>");
                         }
                         const json = formatPre(linkify(e(JSON.stringify(objects, null, 4))), pathname, addId); // Pretty Print the JSON.
                         $(results).append(json);
