@@ -34,9 +34,17 @@ This is the Firefox-compatible version of the [Rockstar Okta extension](https://
   - Covers authentication, authorization, security policies, and system management
 
 ## Installation in Firefox
+1. Open Firefox
+2. Go to `about:addons`
+3. Click on Gear icon
+4. Select "Install Add-on From File..."
+5. Select the `334151ffd36440a8a3ed-3.2.xpi` file from this folder
+
+## Temporary installation in Firefox (for development or debugging purposes)
 
 1. Open Firefox
 2. Go to `about:debugging`
 3. Click "This Firefox"
 4. Click "Load Temporary Add-on"
 5. Select the `manifest.json` file from this folder
+
