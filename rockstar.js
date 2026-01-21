@@ -115,10 +115,6 @@
         }
     };
 
-    if (location.href == "https://gabrielsroka.github.io/rockstar/") {
-        alert("To install rockstar, open your bookmark toolbar, then drag and drop it. To use it, login to Okta or Okta Admin, then click rockstar. See the Usage instructions on this page.");
-        return;
-    }
     if (location.pathname.match("^/(api|oauth2|\\.well-known)/")) {
         formatJSON();
     } else if (location.host.match(/-admin/)) { // Admin pages
@@ -150,7 +146,6 @@
             clearInterval(intervalID);
         }, 200);        
         exportObjects();
-        //createPrefixA("<li>", "Export Objects", "#nav-admin-reports-2", exportObjects);
 
         if (location.pathname == "/admin/users") {
             openLogList('deletedUsers');
@@ -195,8 +190,6 @@
         mainPopup = createPopup("rockstar", true);
         quickUpdate();
         userHome();
-    //} else if (location.host == "developer.okta.com" && location.pathname.startsWith("/docs/reference/api/")) {
-    //    tryAPI();
     }
 
     function whatsNew() {
@@ -694,7 +687,6 @@
                 if (!els.length) els = document.querySelectorAll("#ad-import-ou-" + type + "-picker input");
                 els.forEach(el => {
                     el.parentNode.title = el.value;
-                    //el.previousSibling.click();
                 });
             }
         });        
@@ -893,21 +885,11 @@
                     user => toCSV(user.id, user.profile.login, user.profile.firstName, user.profile.lastName, user.status));
             });
             createDiv("Export Group Members (custom)", mainPopup, () => exportUsers('Group Members', `/api/v1/groups/${groupId}/users`, false));
-        // TODO: what to do here?
-        // } else {
-        //     exportPopup = createPopup("Export");
-        //     exportPopup.html("Error. Go to one of these:<br><br>" +
-        //         "<a href='/admin/users'>Directory > People</a><br>" +
-        //         "<a href='/admin/groups'>Directory > Groups</a><br>" +
-        //         "<a href='/admin/people/directories'>Directory > Directory Integrations</a> and click on a Directory<br>" +
-        //         "<a href='/admin/apps/active'>Applications > Applications</a> and click on an App<br>" +
-        //         "<a href='/admin/apps/active'>Applications > Applications</a> to export Apps<br>" +
-        //         "<a href='/admin/access/networks'>Security > Networks</a><br>");
         }
         function exportUsers(o, url, filter) {
             exportPopup = createPopup("Export " + o, false, true);
             exportPopup.append("<br>Columns to export");
-            var errorBox = $('<div style="padding: 10px; border: 1px solid currentColor; border-radius: 4px; margin-bottom: 10px;"></div>').appendTo(exportPopup);
+            var errorBox = $('<div style="padding: 10px;"></div>').appendTo(exportPopup);
             var checkboxDiv = $("<div style='overflow-y: scroll; height: 152px; width: 500px; border: 1px solid #ccc;'></div>").appendTo(exportPopup);
             
             function addCheckbox(value, text) {
@@ -1118,15 +1100,6 @@
             var ssoPopup;
             var label = "Show SSO";
             var labels = document.getElementsByClassName("app-button-name");
-            // if (labels.length == 0) { // New homepage
-            //     labels = document.getElementsByClassName('chiclet--app-title');
-            //     if (labels.length == 0) return;
-            //     $('.chiclet--action').click(() => {
-            //         setTimeout(() => {
-            //             $('<div>Show SSO</div>').appendTo('.app-settings--launch-app').click(console.log);
-            //         }, 1000);
-            //     })
-            // } else 
             if (labels.length > 0) { // Button labels on old Okta homepage
                 for (var i = 0; i < labels.length; i++) {
                     if (!labels[i].innerHTML.match(label)) {
@@ -1548,8 +1521,7 @@
             }
         }
         const ths = [];
-        objects.forEach(o => addTh(o, '')); // DON'T DO: forEach(addTh), cuz forEach will send addTh extra arrghs!
-        // ths.sort(); // (t1, t2) => t1.startsWith('_links') ? 1 : t2.startsWith('_links') ? -1 : t1.localeCompare(t2));
+        objects.forEach(o => addTh(o, ''));
         const rows = [];
         objects.forEach(row => {
             const tds = [];
@@ -1578,37 +1550,6 @@
     function linkify(s) {
         return s.replace(/"(https?.*)"/g, '"<a href="$1">$1</a>"');
     }
-    /*
-    // This doesn't seem to work since the new dev site went up.
-    function tryAPI() {
-        var baseUrl = $(".orgUrl")[0];
-        if (!baseUrl || baseUrl == "https://{yourOktaDomain}") {
-            //baseUrl = "https://EXAMPLE.oktapreview.com"; // TODO it should fail after, eg, 10 s and set a default.
-            setTimeout(tryAPI, 1000);
-            return;
-        }
-        baseUrl = baseUrl.innerText;
-    
-        // TODO: in the resulting JSON, each "id", url [etc?] should be clickable, too.
-        // TODO: show HTTP response headers (need to make a new request?)
-        // TODO: eg, for /api/v1/users, show q/filter/search params in a textbox.
-    
-        $(".api-uri-get").each(function () {
-            var get = $(this);
-            var url = baseUrl + get.text().replace("GET ", "").replace("${userId}", "me");
-            get.parent().append(` <a href='${url}' target='_blank'>Try me -></a>`);
-        });
-        $(".language-sh").each(function () {
-            var get = $(this);
-            var curl = get.text();
-            var matches;
-            if (matches = curl.match(/-X GET[^]*(https.*)"/)) { // [^] matches any character, including \n. `.` does not. The /s flag will fix this, eventually.
-                var url = matches[1].replace(/\\/g, "");
-                get.append(` <a href='${url}' target='_blank'>Try me -></a>`);
-            }
-        });
-    }
-    */
 
     // Util functions
     if ($) {
