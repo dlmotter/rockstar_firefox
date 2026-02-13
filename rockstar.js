@@ -1675,6 +1675,35 @@
         // Apply initial constraints
         setTimeout(constrainToViewport, 0);
         
+        // Force apply critical styles to prevent Okta CSS from overriding
+        // Using setProperty ensures styles are applied even if Okta has CSP restrictions
+        const popupElement = popup[0];
+        if (popupElement) {
+            popupElement.style.setProperty('position', 'absolute', 'important');
+            popupElement.style.setProperty('z-index', '1000', 'important');
+            popupElement.style.setProperty('left', position.left, 'important');
+            popupElement.style.setProperty('top', position.top, 'important');
+            popupElement.style.setProperty('background-color', bgColor, 'important');
+            popupElement.style.setProperty('color', textColor, 'important');
+            popupElement.style.setProperty('border-color', borderColor, 'important');
+            popupElement.style.setProperty('--hover-color', hoverColor);
+            popupElement.style.setProperty('max-height', 'calc(100vh - 40px)', 'important');
+            popupElement.style.setProperty('max-width', 'calc(100vw - 40px)', 'important');
+            popupElement.style.setProperty('width', 'auto', 'important');
+            popupElement.style.setProperty('box-sizing', 'border-box', 'important');
+            popupElement.style.setProperty('overflow', 'auto', 'important');
+            popupElement.style.setProperty('padding', '8px', 'important');
+            popupElement.style.setProperty('margin', '4px', 'important');
+        }
+        
+        // Force apply styles to rockstarButtons container
+        const buttonsElement = popup.find('.rockstarButtons')[0];
+        if (buttonsElement) {
+            buttonsElement.style.setProperty('display', 'block', 'important');
+            buttonsElement.style.setProperty('float', 'right', 'important');
+            buttonsElement.style.setProperty('white-space', 'nowrap', 'important');
+        }
+        
         const popupBody = $("<div></div>").appendTo(popup);
         popup.find('.close').click(() => popup.remove());
         if (main || draggable) {
